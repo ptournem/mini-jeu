@@ -1,71 +1,92 @@
 <?php
-class Personnage
-{
-  private $_id,
-          $_degats,
-          $_nom;
-  
-  const CEST_MOI = 1;
-  const PERSONNAGE_TUE = 2;
-  const PERSONNAGE_FRAPPE = 3;
-  
-  public function frapper(Personnage $perso)
-  {
-    // Avant tout : vérifier qu'on ne se frappe pas soi-même.
-      // Si c'est le cas, on stoppe tout en renvoyant une valeur signifiant que le personnage ciblé est le personnage qui attaque.
-    
-    // On indique au personnage frappé qu'il doit recevoir des dégâts.
-  }
-  
-  public function recevoirDegats()
-  {
-    // On augmente de 5 les dégâts.
-    
-    // Si on a 100 de dégâts ou plus, la méthode renverra une valeur signifiant que le personnage a été tué.
-    
-    // Sinon, elle renverra une valeur signifiant que le personnage a bien été frappé.
-  }
-  
-  public function degats()
-  {
-    return $this->_degats;
-  }
-  
-  public function id()
-  {
-    return $this->_id;
-  }
-  
-  public function nom()
-  {
-    return $this->_nom;
-  }
-  
-  public function setDegats($degats)
-  {
-    $degats = (int) $degats;
-    
-    if ($degats >= 0 && $degats <= 100)
-    {
-      $this->_degats = $degats;
+
+class Personnage {
+
+    private $_id,
+            $_degats,
+            $_nom;
+
+    const CEST_MOI = 1; // Constante renvoyée par la méthode `frapper` si on se frappe soi-même.
+    const PERSONNAGE_TUE = 2; // Constante renvoyée par la méthode `frapper` si on a tué le personnage en le frappant.
+    const PERSONNAGE_FRAPPE = 3; // Constante renvoyée par la méthode `frapper` si on a bien frappé le personnage.
+
+    public function __construct(array $donnees) {
+        $this->hydrate($donnees);
     }
-  }
-  
-  public function setId($id)
-  {
-    $id = (int) $id;
-    
-    if ($id > 0)
-    {
-      $this->_id = $id;
+
+    public function frapper(Personnage $perso) {
+        //Le perso ne doit pas se frapper lui-même.
+        if ($perso->id() == $this->_id) {
+            return self::CEST_MOI;
+        }
+
+        //On indique au personnage frappé qu'il reçoit des dégats.
+        // Puis on retourne la valeur renvoyée par la méthode : self::PERSONNAGE_TUE ou self::PERSONNAGE_FRAPPE
+        return $perso->recevoirDegats();
     }
-  }
-  
-  public function setNom($nom)
-  {
-    if (is_string($nom))
-    {
-      $this->_nom = $nom;
+
+    public function hydrate(array $donnees) {
+        foreach ($donnees as $key => $value) {
+            $method = 'set' . ucfirst($key);
+
+            if (method_exists($this, $method)) {
+                $this->$method($value);
+            }
+        }
     }
-  }
+
+    public function recevoirDegats() {
+        //chaque coup fait augmenter de 5 points les dégats.
+        $this->_degats += 5;
+        //A 100 points de dégats ou plus, on indique au personnage qu'il est tué.
+        if ($this->_degats >= 100) {
+            return seflf::PERSONNAGE_TUE;
+        }
+        //Sinon qu'il a été frappé.
+        return self::PERSONNAGE_FRAPPE;
+    }
+
+    //GETTERS 
+    // Ceci est la méthode degats() : elle se charge de renvoyer le contenu de l'attribut $_degats.
+    public function degats() {
+        return $this->_degats;
+    }
+
+    // Ceci est la méthode id() : elle se charge de renvoyer le contenu de l'attribut $_id.
+    public function id() {
+        return $this->_id;
+    }
+
+    // Ceci est la méthode degats() : elle se charge de renvoyer le contenu de l'attribut $_nom.
+    public function nom() {
+        return $this->_nom;
+    }
+
+    //Mutateur chargé de modifier l'attibut $_degats.
+    public function setDegats($degats) {
+        $degats = (int) $degats;
+
+        if ($degats >= 0 && $degats <= 100) {
+            $this->_degats = $degats;
+        }
+    }
+
+    public function setId($id) {
+        $id = (int) $id;
+
+        if ($id > 0) {
+            $this->_id = $id;
+        }
+    }
+
+    public function setNom($nom) {
+        if (is_string($nom)) {
+            $this->_nom = $nom;
+        }
+    }
+
+    public function nomValide() {
+        return !empty($this->_nom);
+    }
+
 }
