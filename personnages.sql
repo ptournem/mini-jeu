@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le :  jeu. 09 nov. 2017 à 12:32
+-- Généré le :  jeu. 09 nov. 2017 à 14:41
 -- Version du serveur :  5.7.19
 -- Version de PHP :  7.1.9
 
@@ -35,18 +35,19 @@ CREATE TABLE IF NOT EXISTS `personnages` (
   `degats` tinyint(3) NOT NULL DEFAULT '0',
   `level` tinyint(3) NOT NULL DEFAULT '1',
   `experience` tinyint(3) NOT NULL DEFAULT '0',
+  `strength` tinyint(3) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
 --
 -- Déchargement des données de la table `personnages`
 --
 
-INSERT INTO `personnages` (`id`, `nom`, `degats`, `level`, `experience`) VALUES
-(1, 'Soba', 80, 2, 10),
-(3, 'mout', 95, 2, 10),
-(7, 'pif', 0, 1, 25),
-(6, 'pouf', 95, 1, 20);
+INSERT INTO `personnages` (`id`, `nom`, `degats`, `level`, `experience`, `strength`) VALUES
+(10, 'boby', 26, 1, 0, 1),
+(11, 'Soba', 12, 1, 0, 1),
+(12, 'Pout', 6, 1, 0, 1),
+(13, 'machin', 0, 2, 10, 3);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

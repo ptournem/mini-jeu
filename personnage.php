@@ -6,7 +6,8 @@ class Personnage {
             $_degats,
             $_nom,
             $_level,
-            $_experience;
+            $_experience,
+            $_strength;
 
     const CEST_MOI = 1; // Constante renvoyée par la méthode `frapper` si on se frappe soi-même.
     const PERSONNAGE_TUE = 2; // Constante renvoyée par la méthode `frapper` si on a tué le personnage en le frappant.
@@ -20,16 +21,19 @@ class Personnage {
         //Le perso ne doit pas se frapper lui-même.
         if ($perso->id() == $this->_id) {
             return self::CEST_MOI;
-        }else 
+        } else {
             $this->_experience += 5;
-        $this->_level;
-        if ($this->_experience == 100) {
-            $this->_experience = 0;
-            $this->_level +=1;
+            $strength = $this->_strength;
+            $this->_level;
+            if ($this->_experience == 100) {
+                $this->_experience = 0;
+                $this->_level += 1;
+                $this->_strength += 2;
+            }
         }
         //On indique au personnage frappé qu'il reçoit des dégats.
         // Puis on retourne la valeur renvoyée par la méthode : self::PERSONNAGE_TUE ou self::PERSONNAGE_FRAPPE
-        return $perso->recevoirDegats();
+        return $perso->recevoirDegats($strength);
     }
 
     public function hydrate(array $donnees) {
@@ -42,9 +46,9 @@ class Personnage {
         }
     }
 
-    public function recevoirDegats() {
+    public function recevoirDegats($strength) {
         //chaque coup fait augmenter de 5 points les dégats.
-        $this->_degats += 5;
+        $this->_degats += 5 + $strength;
         //A 100 points de dégats ou plus, on indique au personnage qu'il est tué.
         if ($this->_degats >= 100) {
             return self::PERSONNAGE_TUE;
@@ -52,7 +56,6 @@ class Personnage {
         //Sinon qu'il a été frappé.
         return self::PERSONNAGE_FRAPPE;
     }
-
 
     //GETTERS 
     // Ceci est la méthode degats() : elle se charge de renvoyer le contenu de l'attribut $_degats.
@@ -77,6 +80,10 @@ class Personnage {
 
     public function experience() {
         return $this->_experience;
+    }
+
+    public function strength() {
+        return $this->_strength;
     }
 
     //Mutateur chargé de modifier l'attibut $_degats.
@@ -113,6 +120,13 @@ class Personnage {
         $experience = (int) $experience;
         if ($experience >= 0 && $experience <= 100) {
             $this->_experience = $experience;
+        }
+    }
+
+    public function setstrength($strength) {
+        $strength = (int) $strength;
+        if ($strength >= 1 && $strength <= 100) {
+            $this->_strength = $strength;
         }
     }
 
