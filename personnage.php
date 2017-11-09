@@ -4,7 +4,9 @@ class Personnage {
 
     private $_id,
             $_degats,
-            $_nom;
+            $_nom,
+            $_level,
+            $_experience;
 
     const CEST_MOI = 1; // Constante renvoyée par la méthode `frapper` si on se frappe soi-même.
     const PERSONNAGE_TUE = 2; // Constante renvoyée par la méthode `frapper` si on a tué le personnage en le frappant.
@@ -18,8 +20,13 @@ class Personnage {
         //Le perso ne doit pas se frapper lui-même.
         if ($perso->id() == $this->_id) {
             return self::CEST_MOI;
+        }else 
+            $this->_experience += 5;
+        $this->_level;
+        if ($this->_experience == 100) {
+            $this->_experience = 0;
+            $this->_level +=1;
         }
-
         //On indique au personnage frappé qu'il reçoit des dégats.
         // Puis on retourne la valeur renvoyée par la méthode : self::PERSONNAGE_TUE ou self::PERSONNAGE_FRAPPE
         return $perso->recevoirDegats();
@@ -40,11 +47,12 @@ class Personnage {
         $this->_degats += 5;
         //A 100 points de dégats ou plus, on indique au personnage qu'il est tué.
         if ($this->_degats >= 100) {
-            return seflf::PERSONNAGE_TUE;
+            return self::PERSONNAGE_TUE;
         }
         //Sinon qu'il a été frappé.
         return self::PERSONNAGE_FRAPPE;
     }
+
 
     //GETTERS 
     // Ceci est la méthode degats() : elle se charge de renvoyer le contenu de l'attribut $_degats.
@@ -57,9 +65,18 @@ class Personnage {
         return $this->_id;
     }
 
-    // Ceci est la méthode degats() : elle se charge de renvoyer le contenu de l'attribut $_nom.
+    // Ceci est la méthode nom() : elle se charge de renvoyer le contenu de l'attribut $_nom.
     public function nom() {
         return $this->_nom;
+    }
+
+    // Ceci est la méthode level() : elle se charge de renvoyer le contenu de l'attribut $_level.
+    public function level() {
+        return $this->_level;
+    }
+
+    public function experience() {
+        return $this->_experience;
     }
 
     //Mutateur chargé de modifier l'attibut $_degats.
@@ -82,6 +99,20 @@ class Personnage {
     public function setNom($nom) {
         if (is_string($nom)) {
             $this->_nom = $nom;
+        }
+    }
+
+    public function setLevel($level) {
+        $level = (int) $level;
+        if ($level >= 1 && $level <= 100) {
+            $this->_level = $level;
+        }
+    }
+
+    public function setExperience($experience) {
+        $experience = (int) $experience;
+        if ($experience >= 0 && $experience <= 100) {
+            $this->_experience = $experience;
         }
     }
 
