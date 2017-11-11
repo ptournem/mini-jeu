@@ -19,6 +19,7 @@ class PersonnagesManager {
             'level' => 1,
             'experience' => 0,
             'strength' => 1,
+            'atout' => 0,
         ]);
     }
 
@@ -45,46 +46,64 @@ class PersonnagesManager {
 
     public function get($info) {
         if (is_int($info)) {
-            $q = $this->_db->query('SELECT id, nom, degats, level, experience, strength FROM personnages WHERE id = ' . $info);
+            $q = $this->_db->query('SELECT id, nom, degats, level, experience, '
+                    . 'strength, timeEndormi, type, atout FROM personnages '
+                    . 'WHERE id = ' . $info);
             $donnees = $q->fetch(PDO::FETCH_ASSOC);
-
-            return new Personnage($donnees);
         } else {
-            $q = $this->_db->prepare('SELECT id, nom, degats, level, experience, strength FROM personnages WHERE nom = :nom');
+            $q = $this->_db->prepare('SELECT id, nom, degats, level, experience,'
+                    . ' strength, timeEndormi, type, atout FROM personnages '
+                    . 'WHERE nom = :nom');
             $q->execute([':nom' => $info]);
 
-            return new Personnage($q->fetch(PDO::FETCH_ASSOC));
+            $perso = $q->fetch(PDO::FETCH_ASSOC);
+        
+        switch ($perso['type']) {
+            case 'guerrier': return new Guerrier($perso);
+            case 'magicien': return new Magicien($perso);
+            default: return null;
+        }
         }
     }
 
     public function getList($nom) {
         $persos = [];
 
-        $q = $this->_db->prepare('SELECT id, nom, degats FROM personnages WHERE nom <> :nom ORDER BY nom');
+        $q = $this->_db->prepare('SELECT id, nom, degats, level, experience, '
+                . 'strength, timeEndormi, type, atout FROM personnages '
+                . 'WHERE nom <> :nom ORDER BY nom');
         $q->execute([':nom' => $nom]);
 
         while ($donnees = $q->fetch(PDO::FETCH_ASSOC)) {
-            $persos[] = new Personnage($donnees);
+            switch ($donnees['type']) {
+                case 'guerrier': $persos[] = new Guerrier($donnees);
+                    break;
+                case 'magicien': $persos[] = new Magicien($donnees);
+                    break;
+            }
         }
 
         return $persos;
     }
 
     public function update(Personnage $perso) {
-        $q = $this->_db->prepare('UPDATE personnages SET degats = :degats, level = :level, experience = :experience, strength = :strength WHERE id = :id');
+        $q = $this->_db->prepare('UPDATE personnages SET degats = :degats,'
+                . ' level = :level, experience = :experience, strength = :strength, '
+                . 'timeEndormi= :timeEndormi, atout = :atout WHERE id = :id');
 
         $q->bindValue(':degats', $perso->degats(), PDO::PARAM_INT);
         $q->bindValue(':id', $perso->id(), PDO::PARAM_INT);
         $q->bindValue(':level', $perso->level(), PDO::PARAM_INT);
         $q->bindValue(':experience', $perso->experience(), PDO::PARAM_INT);
         $q->bindValue(':strength', $perso->strength(), PDO::PARAM_INT);
-
+        $q->bindValue(':timeEndormi', $perso->timeEndormi(), PDO::PARAM_INT);
+        $q->bindValue(':atout', $perso->atout(), PDO::PARAM_INT);
 
         $q->execute();
     }
 
-    public function setDb(PDO $db) {
-        $this->_db = $db;
-    }
-
+ public function setDb(PDO $db)
+  {
+    $this->_db = $db;
+  }
 }

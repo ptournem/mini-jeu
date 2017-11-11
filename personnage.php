@@ -1,26 +1,41 @@
 <?php
 
-class Personnage {
+abstract class Personnage {
 
-    private $_id,
+    protected $_id,
             $_degats,
             $_nom,
             $_level,
             $_experience,
-            $_strength;
+            $_strength,
+            $_atout,
+            $_timeEndormi,
+            $_type;
 
     const CEST_MOI = 1; // Constante renvoyée par la méthode `frapper` si on se frappe soi-même.
     const PERSONNAGE_TUE = 2; // Constante renvoyée par la méthode `frapper` si on a tué le personnage en le frappant.
     const PERSONNAGE_FRAPPE = 3; // Constante renvoyée par la méthode `frapper` si on a bien frappé le personnage.
+    const PERSONNAGE_ENSORCELE = 4; // Constante renvoyée par la méthode `lancerUnSort` (voir classe Magicien) si on a bien ensorcelé un personnage.
+    const PAS_DE_MAGIE = 5; // Constante renvoyée par la méthode `lancerUnSort` (voir classe Magicien) si on veut jeter un sort alors que la magie du magicien est à 0.
+    const PERSO_ENDORMI = 6; // Constante renvoyée par la méthode `frapper` si le personnage qui veut frapper est endormi.
 
     public function __construct(array $donnees) {
         $this->hydrate($donnees);
+        $this->type = strtolower(static::class);
+    }
+
+    public function estEndormi() {
+        return $this->_timeEndormi > time();
     }
 
     public function frapper(Personnage $perso) {
         //Le perso ne doit pas se frapper lui-même.
         if ($perso->id() == $this->_id) {
             return self::CEST_MOI;
+        }
+
+        if ($this->estEndormi()) {
+            return self::PERSO_ENDORMI;
         } else {
             $this->_experience += 5;
             $strength = $this->_strength;
@@ -31,6 +46,9 @@ class Personnage {
                 $this->_strength += 2;
             }
         }
+
+
+
         //On indique au personnage frappé qu'il reçoit des dégats.
         // Puis on retourne la valeur renvoyée par la méthode : self::PERSONNAGE_TUE ou self::PERSONNAGE_FRAPPE
         return $perso->recevoirDegats($strength);
@@ -46,6 +64,10 @@ class Personnage {
         }
     }
 
+    public function nomValide() {
+        return !empty($this->_nom);
+    }
+
     public function recevoirDegats($strength) {
         //chaque coup fait augmenter de 5 points les dégats.
         $this->_degats += 5 + $strength;
@@ -55,6 +77,24 @@ class Personnage {
         }
         //Sinon qu'il a été frappé.
         return self::PERSONNAGE_FRAPPE;
+    }
+
+    public function reveil() {
+        $secondes = $this->_timeEndormi;
+        $secondes -= time();
+
+        $heures = floor($secondes / 3600);
+        $secondes -= $heures * 3600;
+        $minutes = floor($secondes / 60);
+        $secondes -= $minutes * 60;
+
+        $heures .= ($heures <= 1) ? 'heure' : 'heures';
+        $minutes .= ($minutes <= 1) ? 'minute' : 'minutes';
+        $secondes .= ($secondes <= 1) ? 'seconde' : 'secondes';
+
+        $total = $this->_timeEndormi;
+
+        return $heures . ',' . $minutes . 'et' . $secondes . 'TOTAL (' . $total . ') Time : ';
     }
 
     //GETTERS 
@@ -84,6 +124,18 @@ class Personnage {
 
     public function strength() {
         return $this->_strength;
+    }
+
+    public function atout() {
+        return $this->_atout;
+    }
+
+    public function timeEndormi() {
+        return $this->_timEndormi;
+    }
+
+    public function type() {
+        return $this->_type;
     }
 
     //Mutateur chargé de modifier l'attibut $_degats.
@@ -130,8 +182,16 @@ class Personnage {
         }
     }
 
-    public function nomValide() {
-        return !empty($this->_nom);
+    public function setAtout($atout) {
+        $atout = (int) $atout;
+
+        if ($atout >= 0 && $atout <= 100) {
+            $this->_atout = $atout;
+        }
+    }
+
+    public function setTimeEndormi($time) {
+        $this->_timeEndormi = (int) $time;
     }
 
 }
